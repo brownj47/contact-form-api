@@ -1,9 +1,9 @@
-import { Stack, StackProps } from "aws-cdk-lib";
+import { RemovalPolicy, Stack, StackProps } from "aws-cdk-lib";
 import * as sns from "aws-cdk-lib/aws-sns";
-import * as subs from "aws-cdk-lib/aws-sns-subscriptions";
 import * as apiGateway from "aws-cdk-lib/aws-apigateway";
 import * as chatbot from "aws-cdk-lib/aws-chatbot";
-import * as lambda from "aws-cdk-lib/aws-lambda";
+import * as lambdaNodejs from "aws-cdk-lib/aws-lambda-nodejs";
+import { Runtime } from "aws-cdk-lib/aws-lambda";
 
 
 import 'dotenv/config'
@@ -17,7 +17,7 @@ export class ContactFormApiStack extends Stack {
 
     const contactFormApiTopic = new sns.Topic(this, "ContactFormApiTopic");
 
-    new chatbot.SlackChannelConfiguration(this, "ContactFormSlackChannel", {
+    new chatbot.SlackChannelConfiguration(this, "ContactFormPortfolioSlackChannel", {
       slackChannelConfigurationName: "ContactFormPortfolioSlackChannel",
       slackWorkspaceId: process.env.SLACK_WORKSPACE_ID || "",
       slackChannelId: process.env.CONTACT_FORM_CHANNEL_ID || "",
@@ -25,14 +25,25 @@ export class ContactFormApiStack extends Stack {
       logRetention: RetentionDays.FIVE_DAYS,
     })
 
-    // make a REST API Gateway
-    const contactFormApi = new apiGateway.RestApi(this, "contact-me", {
-      restApiName: "Contact Form API",
-      description: "This API handles contact form submissions",
+    const contactFormLambda = new lambdaNodejs.NodejsFunction(this, "ContactFormLambda", {
+      functionName: "ContactFormLambda",
+      entry: "functions/contact-form.ts",
+      runtime: Runtime.NODEJS_18_X,
+      logRetention: RetentionDays.FIVE_DAYS,
+      environment: {
+        SNS_TOPIC_ARN: contactFormApiTopic.topicArn,
+      },
     });
-    contactFormApi.root.addMethod("POST");
-  };
 
-  // hook APIGateway to SNS in Chatbot approved format (may require a lambda)
+    contactFormApiTopic.grantPublish(contactFormLambda);
+
+    const contactFormApi = new apiGateway.LambdaRestApi(this, "ContactFormApi", {
+      handler: contactFormLambda,
+      restApiName: "ContactFormApi",
+    }
+
+    );
+
+  };
 
 }
