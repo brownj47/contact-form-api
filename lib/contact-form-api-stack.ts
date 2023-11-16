@@ -69,7 +69,7 @@ export class ContactFormApiStack extends Stack {
       ]
     });
 
-    const contactFormApiKey = contactFormApi.addApiKey("RateLimitedContactFormApiKey");
+    const contactFormApiKey = contactFormApi.addApiKey("ContactFormApiKey");
 
     contactFormApiUsagePlan.addApiKey(contactFormApiKey);
 

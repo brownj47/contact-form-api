@@ -13,13 +13,18 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
     const body = event.body || ""
     const { name, email, message } = JSON.parse(body)
+    const title = ":boom: Contact Form Submission :boom:"
+    let messageToSlack = `${name} sent a message: \n`
+    messageToSlack += `\`\`\`${message}\`\`\`\n`
+    messageToSlack += `Email them back at ${email}`
+
     const customNotification = {
         "version": "1.0",
         "source": "custom",
         "content": {
-            "description": `:fireworks: ${name} (${email}) sent a message: ${message}`
+            title,
+            "description": messageToSlack,
         }
-
     }
 
     const publishCommandInput: PublishCommandInput = {
