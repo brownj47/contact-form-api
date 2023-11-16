@@ -19,6 +19,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
         "content": {
             "description": `:fireworks: ${name} (${email}) sent a message: ${message}`
         }
+
     }
 
     const publishCommandInput: PublishCommandInput = {

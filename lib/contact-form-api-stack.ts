@@ -1,12 +1,12 @@
-import { RemovalPolicy, Stack, StackProps } from "aws-cdk-lib";
+import { Stack, StackProps } from "aws-cdk-lib";
 import * as sns from "aws-cdk-lib/aws-sns";
-import * as apiGateway from "aws-cdk-lib/aws-apigateway";
+import * as apigateway from "aws-cdk-lib/aws-apigateway";
 import * as chatbot from "aws-cdk-lib/aws-chatbot";
 import * as lambdaNodejs from "aws-cdk-lib/aws-lambda-nodejs";
 import { Runtime } from "aws-cdk-lib/aws-lambda";
 
 
-import 'dotenv/config'
+import "dotenv/config"
 
 import { Construct } from "constructs";
 import { RetentionDays } from "aws-cdk-lib/aws-logs";
@@ -37,15 +37,41 @@ export class ContactFormApiStack extends Stack {
 
     contactFormApiTopic.grantPublish(contactFormLambda);
 
-    const contactFormApi = new apiGateway.LambdaRestApi(this, "ContactFormApi", {
-      handler: contactFormLambda,
-      restApiName: "ContactFormApi",
+    const contactFormApi = new apigateway.RestApi(this, "ContactFormApi", {
       defaultCorsPreflightOptions: {
-        allowOrigins: apiGateway.Cors.ALL_ORIGINS,
+        allowOrigins: apigateway.Cors.ALL_ORIGINS,
         disableCache: true,
-      }
+      },
+      apiKeySourceType: apigateway.ApiKeySourceType.HEADER,
     }
     );
+
+    const contactFormLambdaIntegration = new apigateway.LambdaIntegration(contactFormLambda);
+
+    contactFormApi.root.addMethod("POST", contactFormLambdaIntegration, {
+      apiKeyRequired: true,
+    });
+
+    const contactFormApiUsagePlan = contactFormApi.addUsagePlan("ContactFormApiUsagePlan", {
+      throttle: {
+        rateLimit: 10,
+        burstLimit: 2,
+      },
+      quota: {
+        limit: 1000,
+        period: apigateway.Period.MONTH,
+      },
+      apiStages: [
+        {
+          api: contactFormApi,
+          stage: contactFormApi.deploymentStage,
+        }
+      ]
+    });
+
+    const contactFormApiKey = contactFormApi.addApiKey("RateLimitedContactFormApiKey");
+
+    contactFormApiUsagePlan.addApiKey(contactFormApiKey);
 
   };
 }
