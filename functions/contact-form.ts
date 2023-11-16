@@ -17,7 +17,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
         "version": "1.0",
         "source": "custom",
         "content": {
-            "description": `${name} (${email}) sent a message: ${message}`
+            "description": `:fireworks: ${name} (${email}) sent a message: ${message}`
         }
     }
 
@@ -27,7 +27,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
     }
 
     const publishCommandOutput = await snsClient.send(new PublishCommand(publishCommandInput));
-    console.log("publishCommandOutput:", JSON.stringify(publishCommandOutput, undefined, 2));
+    console.log("publishCommandOutput:", JSON.stringify(publishCommandOutput));
 
     /* https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-output-format
         {
@@ -40,11 +40,11 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
     */
 
     const response = {
-        "isBase64Encoded": false,
         "statusCode": 200,
         "body": JSON.stringify({
             message: "Your message has been sent!",
         }),
+        "isBase64Encoded": false,
     };
 
     return response;

@@ -40,10 +40,12 @@ export class ContactFormApiStack extends Stack {
     const contactFormApi = new apiGateway.LambdaRestApi(this, "ContactFormApi", {
       handler: contactFormLambda,
       restApiName: "ContactFormApi",
+      defaultCorsPreflightOptions: {
+        allowOrigins: apiGateway.Cors.ALL_ORIGINS,
+        disableCache: true,
+      }
     }
-
     );
 
   };
-
 }
