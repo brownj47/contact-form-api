@@ -40,11 +40,18 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
     */
 
     const response = {
+        "isBase64Encoded": false,
         "statusCode": 200,
+        "headers": {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers": "*",
+            "Access-Control-Allow-Methods": "*",
+        },
         "body": JSON.stringify({
             message: "Your message has been sent!",
         }),
-        "isBase64Encoded": false,
+
     };
 
     return response;
