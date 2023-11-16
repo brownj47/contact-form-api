@@ -43,6 +43,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
         "isBase64Encoded": false,
         "statusCode": 200,
         "headers": {
+            // https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-cors.html#apigateway-enable-cors-proxy
             "Content-Type": "application/json",
             "Access-Control-Allow-Origin": "*",
             "Access-Control-Allow-Headers": "*",
