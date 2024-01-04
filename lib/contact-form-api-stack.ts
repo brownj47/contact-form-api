@@ -39,7 +39,7 @@ export class ContactFormApiStack extends Stack {
 
     const contactFormApi = new apigateway.RestApi(this, "ContactFormApi", {
       defaultCorsPreflightOptions: {
-        allowOrigins: apigateway.Cors.ALL_ORIGINS,
+        allowOrigins: ["https://brownj47.github.io"],
         disableCache: true,
       },
       apiKeySourceType: apigateway.ApiKeySourceType.HEADER,
